@@ -1,9 +1,5 @@
 import streamlit as st
 import pandas as pd
-import locale
-
-# Formatação brasileira
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 # Tabela Anexo I (Comércio)
 tabela = pd.DataFrame([
@@ -24,6 +20,10 @@ df_reparticao = pd.DataFrame([
     ("5º Faixa", 5.5, 3.5, 12.74, 2.76, 42.0, 33.5),
     ("6º Faixa", 13.5, 10.0, 28.27, 6.13, 42.10, 0.0)
 ], columns=["Faixa", "IRPJ", "CSLL", "COFINS", "PIS", "CPP", "ICMS"])
+
+# Função auxiliar para formatar valores em R$ (pt-BR)
+def formatar(valor):
+    return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 # Função principal de cálculo
 def calcular_simples_primeiro_mes(receita_mes, tabela):
@@ -75,11 +75,11 @@ if st.button("Calcular"):
             rbt12 = resultado["receita_anual"]
 
             st.success("Cálculo realizado com sucesso:")
-            st.write(f"💰 Receita Anual Estimada: {locale.currency(rbt12, grouping=True)}")
+            st.write(f"💰 Receita Anual Estimada: {formatar(rbt12)}")
             st.write(f"📊 Alíquota Nominal: {resultado['aliquota_nominal']*100:.2f}%")
-            st.write(f"➖ Parcela a Deduzir: {locale.currency(resultado['parcela_deduzir'], grouping=True)}")
+            st.write(f"➖ Parcela a Deduzir: {formatar(resultado['parcela_deduzir'])}")
             st.write(f"✅ Alíquota Efetiva: **{resultado['aliquota_efetiva']*100:.2f}%**")
-            st.write(f"📌 Imposto devido: **{locale.currency(resultado['imposto'], grouping=True)}**")
+            st.write(f"📌 Imposto devido: **{formatar(resultado['imposto'])}**")
 
             # Repartição por tributo
             faixa = resultado["faixa"]
@@ -95,7 +95,7 @@ if st.button("Calcular"):
                         valor = resultado["imposto"] * (linha[tributo] / 100)
                     dados_tabela.append({
                         "Tributo": tributo,
-                        "Valor": locale.currency(round(valor, 2), grouping=True)
+                        "Valor": formatar(round(valor, 2))
                     })
 
                 df_resultado = pd.DataFrame(dados_tabela)
