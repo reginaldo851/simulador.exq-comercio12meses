@@ -110,13 +110,14 @@ if st.button("🔵 Calcular"):
             st.error("Empresa sujeita a EXCLUSÃO do Simples Nacional a partir do ano seguinte.")
 
         # Mensagem final institucional
-        st.markdown(\"\"\"
-        <div style='text-align: justify; font-size: 15px; margin-top: 20px;'>
-        <strong>Cálculo atualizado em Maio/2025. Desenvolvido por Reginaldo Ramos | Explica no Quadro!</strong><br>
-        Esta é uma ferramenta auxiliar para a atividade de planejamento fiscal e tributário.<br>
-        Sempre consultar a legislação aplicável para o cálculo e recolhimento de tributos.
-        </div>
-        \"\"\", unsafe_allow_html=True)
+        st.markdown("""
+<div style='text-align: justify; font-size: 15px; margin-top: 20px;'>
+<strong>Cálculo atualizado em Maio/2025. Desenvolvido por Reginaldo Ramos | Explica no Quadro!</strong><br>
+Esta é uma ferramenta auxiliar para a atividade de planejamento fiscal e tributário.<br>
+Sempre consultar a legislação aplicável para o cálculo e recolhimento de tributos.
+</div>
+""", unsafe_allow_html=True)
+
 
     except Exception:
         st.error("Erro ao realizar o cálculo, entre em contato pelo número de whatsapp abaixo ou envie um e-mail para: reginaldo.cont@gmail.com")
