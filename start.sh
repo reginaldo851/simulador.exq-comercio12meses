@@ -1,2 +1,2 @@
 #!/bin/bash
-python fator_r.py
+streamlit run fator_r.py --server.port=10000 --server.enableCORS=false
