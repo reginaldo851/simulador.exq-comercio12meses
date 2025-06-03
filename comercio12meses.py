@@ -49,58 +49,63 @@ if periodo:
             receitas_anteriores[mes] = st.number_input(f"Receita de {mes}:", min_value=0.0, key=mes)
 
         if st.button("Calcular"):
-            rbt12 = sum(receitas_anteriores.values())
+            try:
+                rbt12 = sum(receitas_anteriores.values())
 
-            # Verifica faixa e calcula alíquota efetiva
-            for faixa in tabela:
-                if faixa[0] <= rbt12 <= faixa[1]:
-                    aliquota_nominal = faixa[2]
-                    parcela_deduzir = faixa[3]
-                    nome_faixa = faixa[4]
-                    break
-            else:
-                st.error("RBT12 fora do limite do Simples Nacional.")
-                st.stop()
-
-            aliquota_efetiva = ((rbt12 * aliquota_nominal) - parcela_deduzir) / rbt12
-            imposto = receita_mes * aliquota_efetiva
-
-            st.success("Cálculo realizado com sucesso!")
-            st.markdown(f"- **RBT12:** {formatar(rbt12)}")
-            st.markdown(f"- **Faixa:** {nome_faixa}")
-            st.markdown(f"- **Alíquota Nominal:** {aliquota_nominal * 100:.2f}%")
-            st.markdown(f"- **Parcela a Deduzir:** {formatar(parcela_deduzir)}")
-            st.markdown(f"- **Alíquota Efetiva:** **{aliquota_efetiva * 100:.2f}%**")
-            st.markdown(f"- **Imposto devido no mês:** **{formatar(imposto)}**")
-
-            # Distribuição dos tributos
-            st.markdown("### Distribuição dos Tributos:")
-            dist = distribuicao[nome_faixa]
-            dist_final = []
-            total = 0
-            for tributo, perc in dist.items():
-                if tributo == "ICMS" and rbt12 > 3600000:
-                    valor = 0.0
+                # Verifica faixa e calcula alíquota efetiva
+                for faixa in tabela:
+                    if faixa[0] <= rbt12 <= faixa[1]:
+                        aliquota_nominal = faixa[2]
+                        parcela_deduzir = faixa[3]
+                        nome_faixa = faixa[4]
+                        break
                 else:
-                    valor = imposto * perc
-                total += valor
-                dist_final.append({"Tributo": tributo, "Valor": formatar(valor)})
+                    st.error("RBT12 fora do limite do Simples Nacional.")
+                    st.stop()
 
-            dist_final.append({"Tributo": "**Total**", "Valor": f"**{formatar(total)}**"})
-            df_resultado = pd.DataFrame(dist_final)
-            st.table(df_resultado)
+                aliquota_efetiva = ((rbt12 * aliquota_nominal) - parcela_deduzir) / rbt12
+                imposto = receita_mes * aliquota_efetiva
 
-            # Alerta sobre ICMS fora do Simples
-            if rbt12 > 3600000:
-                st.warning("⚠️ RBT12 superior ao valor de R$ 3.600.000,00 – ICMS a ser recolhido pelo regime normal de tributação seguindo as regras do seu Estado.")
+                st.success("Cálculo realizado com sucesso!")
+                st.markdown(f"- **RBT12:** {formatar(rbt12)}")
+                st.markdown(f"- **Faixa:** {nome_faixa}")
+                st.markdown(f"- **Alíquota Nominal:** {aliquota_nominal * 100:.2f}%")
+                st.markdown(f"- **Parcela a Deduzir:** {formatar(parcela_deduzir)}")
+                st.markdown(f"- **Alíquota Efetiva:** **{aliquota_efetiva * 100:.2f}%**")
+                st.markdown(f"- **Imposto devido no mês:** **{formatar(imposto)}**")
 
-            # Rodapé institucional
-            st.markdown("""
-            <div style="text-align: justify; font-size: 0.9rem; margin-top: 20px;">
-            <strong>Cálculo atualizado em Maio/2025. Desenvolvido por Reginaldo Ramos | Explica no Quadro!</strong><br>
-            Esta é uma ferramenta auxiliar para a atividade de planejamento fiscal e tributário. Sempre consultar a legislação aplicável para o cálculo e recolhimento de tributos.
-            </div>
-            """, unsafe_allow_html=True)
+                # Distribuição dos tributos
+                st.markdown("### Distribuição dos Tributos:")
+                dist = distribuicao[nome_faixa]
+                dist_final = []
+                total = 0
+                for tributo, perc in dist.items():
+                    if tributo == "ICMS" and rbt12 > 3600000:
+                        valor = 0.0
+                    else:
+                        valor = imposto * perc
+                    total += valor
+                    dist_final.append({"Tributo": tributo, "Valor": formatar(valor)})
+
+                dist_final.append({"Tributo": "**Total**", "Valor": f"**{formatar(total)}**"})
+                df_resultado = pd.DataFrame(dist_final)
+                st.table(df_resultado)
+
+                # Alerta sobre ICMS fora do Simples
+                if rbt12 > 3600000:
+                    st.warning("⚠️ RBT12 superior a R$ 3.600.000,00 – ICMS será recolhido fora do Simples Nacional.")
+
+                # Rodapé institucional
+                st.markdown("""
+                <div style="text-align: justify; font-size: 0.9rem; margin-top: 20px;">
+                <strong>Cálculo atualizado em Maio/2025. Desenvolvido por Reginaldo Ramos | Explica no Quadro!</strong><br>
+                Esta é uma ferramenta auxiliar para a atividade de planejamento fiscal e tributário.<br>
+                Sempre consultar a legislação aplicável para o cálculo e recolhimento de tributos.
+                </div>
+                """, unsafe_allow_html=True)
+
+            except Exception:
+                st.error("Erro ao processar o cálculo. Se possível comunicar o erro para contato@explicanoquadro.com.br")
 
     except ValueError:
-        st.error("Formato inválido para o período. Use MM/AAAA.")
+        st.error("Erro ao processar o cálculo. Se possível comunicar o erro para contato@explicanoquadro.com.br")
